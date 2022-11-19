@@ -3,126 +3,103 @@ import "./App.css";
 import Counter from "./Counter";
 import React, { useEffect, useState } from "react";
 import Header from "./components/header";
-function Nav({ topics = [], onChangeMode }) {
-  console.log(topics);
+
+const Card = ({ topics = [], onChangeMode }) => {
+  // const topics = [
+  //   { title: "김채연", body: "김채연이 쓴 글이다." },
+  //   { title: "이가현", body: "이가현이 쓴 글이다." },
+  //   { title: "이예림", body: "이예림이 쓴 글이다." },
+  // ];
   const lis = topics.map((t, i) => {
     return (
-      <li>
-        <a
+      <div>
+        <h2
           onClick={() => {
             onChangeMode(i + 1);
           }}
         >
           {t.title}
-        </a>
-      </li>
+        </h2>
+        <p>{t.body}</p>
+      </div>
     );
   });
+  return <div>{lis}</div>;
+};
 
+const Create = (props) => {
   return (
-    <nav>
-      <ol>{lis}</ol>
-    </nav>
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        const title = e.target.title.value;
+        const body = e.target.body.value;
+        props.onCreate(title, body);
+      }}
+    >
+      <p>
+        <input type="text" name="title" placeholder="이름"></input>
+      </p>
+      <p>
+        <textarea name="body" placeholder="내용"></textarea>
+      </p>
+      <input type="submit" value="Create"></input>
+    </form>
   );
-}
-function Article({ title, body, id, content }) {
-  return (
-    <article>
-      <h2>{title}</h2>
-      {body}
-    </article>
-  );
-}
+};
 
-function Create(props) {
-  return (
-    <article>
-      <h2>Create</h2>
-      <form
-        onSubmit={(event) => {
-          event.preventDefault();
-          const title = event.target.title.value;
-          const body = event.target.body.value;
-          props.onCreate(title, body);
-        }}
-      >
-        <p>
-          {" "}
-          <input type="text" name="title" placeholder="title" />
-        </p>
-        <p>
-          {" "}
-          <textarea name="body" palceholder="body"></textarea>
-        </p>
-        <p>
-          <input type="submit" value="Creat"></input>
-        </p>
-      </form>
-    </article>
-  );
-}
-function App() {
-  const [mode, setMode] = useState("WELCOME");
-  const [id, setId] = useState(null);
-  const [nextId, setNextId] = useState(4);
-  const [search, setSearch] = useState("");
+const App = () => {
+  const [mode, setMode] = useState("READ");
   const [topics, setTopics] = useState([
-    { id: 1, title: "html", body: "html is ..." },
-    { id: 2, title: "css", body: "css is ..." },
-    { id: 3, title: "js", body: "js is ..." },
+    { title: "김채연", body: "김채연이 쓴 글이다." },
+    { title: "이가현", body: "이가현이 쓴 글이다." },
+    { title: "이예림", body: "이예림이 쓴 글이다." },
   ]);
 
-  useEffect(() => {
-    if (id === 1) {
-      alert("1번 클릭하셨네요");
-    }
-    return () => {
-      alert("dkssud");
-    };
-  }, [id]);
-
-  useEffect(() => {}, []);
-  let content = null;
-
+  console.log(mode);
   return (
     <div>
-      <Header
-        title="WEB"
-        onChangeMode={() => {
-          setMode("WELCOME");
-        }}
-      ></Header>
-      <Nav
+      <Card
         topics={topics}
-        onChangeMode={(_id) => {
+        onChangeMode={() => {
           setMode("READ");
-          setId(_id);
         }}
-      ></Nav>
-      {mode == "WELCOME" && <Article id={1} title="Welcome" body="Hello, Web"></Article>}
-      {mode == "READ" && <Article {...topics[id - 1]} />}
+      ></Card>
+      {mode == "READ" &&
+        ((<Card {...topics}></Card>),
+        (
+          <div
+            onClick={(e) => {
+              e.preventDefault();
+              setMode("CREATE");
+            }}
+          >
+            +
+          </div>
+        ))}
       {mode == "CREATE" && (
         <Create
-          onCreate={(_title, _body) => {
-            const newTopic = { id: nextId, title: _title, body: _body };
+          onCreate={(title, body) => {
+            const newTopic = { title: title, body: body };
             const newTopics = [...topics];
             newTopics.push(newTopic);
             setTopics(newTopics);
+            setMode("BACK");
           }}
         ></Create>
       )}
-      <a
-        href="/create"
-        onClick={(event) => {
-          event.preventDefault();
-          setMode("CREATE");
-        }}
-      >
-        create
-      </a>
-      <Counter />
+      {mode == "BACK" && (
+        <div
+          onClick={(e) => {
+            e.preventDefault();
+            setMode("CREATE");
+          }}
+        >
+          +
+        </div>
+      )}
     </div>
   );
-}
+};
 
 export default App;
