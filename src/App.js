@@ -4,7 +4,12 @@ import Counter from "./Counter";
 import React, { useEffect, useState } from "react";
 import Header from "./components/header";
 
-const Card = ({ topics = [], onChangeMode }) => {
+import { Card } from "antd";
+import { Button, Space } from "antd";
+import { Input } from "antd";
+const { TextArea } = Input;
+
+const CardWrap = ({ topics = [], onChangeMode }) => {
   // const topics = [
   //   { title: "김채연", body: "김채연이 쓴 글이다." },
   //   { title: "이가현", body: "이가현이 쓴 글이다." },
@@ -12,15 +17,17 @@ const Card = ({ topics = [], onChangeMode }) => {
   // ];
   const lis = topics.map((t, i) => {
     return (
-      <div>
-        <h2
-          onClick={() => {
-            onChangeMode(i + 1);
+      <div className="site-card-border-less-wrapper">
+        <Card
+          type="inner"
+          title={t.title}
+          bordered={false}
+          style={{
+            width: `${100}%`,
           }}
         >
-          {t.title}
-        </h2>
-        <p>{t.body}</p>
+          <p>{t.body}</p>
+        </Card>
       </div>
     );
   });
@@ -28,6 +35,9 @@ const Card = ({ topics = [], onChangeMode }) => {
 };
 
 const Create = (props) => {
+  const onChange = (e) => {
+    console.log(e);
+  };
   return (
     <form
       onSubmit={(e) => {
@@ -37,13 +47,22 @@ const Create = (props) => {
         props.onCreate(title, body);
       }}
     >
-      <p>
-        <input type="text" name="title" placeholder="이름"></input>
-      </p>
-      <p>
-        <textarea name="body" placeholder="내용"></textarea>
-      </p>
-      <input type="submit" value="Create"></input>
+      <>
+        <Input name="title" placeholder="이름" allowClear onChange={onChange} />
+        <br />
+        <br />
+        <TextArea name="body" placeholder="내용" allowClear onChange={onChange} />
+      </>
+      <Space
+        direction="vertical"
+        style={{
+          width: "100%",
+        }}
+      >
+        <Button type="primary" htmlType="submit" block>
+          글 쓰기
+        </Button>
+      </Space>
     </form>
   );
 };
@@ -59,23 +78,29 @@ const App = () => {
   console.log(mode);
   return (
     <div>
-      <Card
+      <CardWrap
         topics={topics}
         onChangeMode={() => {
           setMode("READ");
         }}
-      ></Card>
+      ></CardWrap>
       {mode == "READ" &&
-        ((<Card {...topics}></Card>),
+        ((<CardWrap {...topics}></CardWrap>),
         (
-          <div
+          <Space
+            direction="vertical"
+            style={{
+              width: "100%",
+            }}
             onClick={(e) => {
               e.preventDefault();
               setMode("CREATE");
             }}
           >
-            +
-          </div>
+            <Button type="dashed" block>
+              +
+            </Button>
+          </Space>
         ))}
       {mode == "CREATE" && (
         <Create
@@ -89,14 +114,20 @@ const App = () => {
         ></Create>
       )}
       {mode == "BACK" && (
-        <div
+        <Space
+          direction="vertical"
+          style={{
+            width: "100%",
+          }}
           onClick={(e) => {
             e.preventDefault();
             setMode("CREATE");
           }}
         >
-          +
-        </div>
+          <Button type="dashed" block>
+            +
+          </Button>
+        </Space>
       )}
     </div>
   );
